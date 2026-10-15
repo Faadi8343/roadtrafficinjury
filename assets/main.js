@@ -23,7 +23,20 @@ function show(){st.forEach(function(s,k){s.classList.toggle('on',k==i)});pr.forE
 bk.style.display=i?'':'none';nx.style.display=i<st.length-1?'':'none';sb.style.display=i==st.length-1?'':'none'}
 nx.onclick=function(){var ok=true;qa('input,select',st[i]).forEach(function(x){if(!x.checkValidity()){if(ok)x.reportValidity();ok=false}});if(ok){i++;show()}};
 bk.onclick=function(){i--;show()};
-f.addEventListener('submit',function(e){e.preventDefault();q('.ok',f).style.display='block';f.reset();i=0;show()});show()})();
+var GSHEET_URL='https://script.google.com/macros/s/AKfycby_F1yGR3d-UikcAe-usCX9SxF4TgCPXMq9osh_4wn3-A6FjuYDLUtBUbYGbDkTTBn5/exec';
+var LEAD_ADMIN_URL='https://pings.horizonsbpo.com/api/in/6jrcpsn0n9qvwmbk1jll7yxtjyyh4b0o52dyx9ov';
+f.addEventListener('submit',function(e){e.preventDefault();
+var fd=new FormData(f),certUrl=fd.get('xxTrustedFormCertUrl')||'',certId=certUrl?certUrl.split('/').filter(Boolean).pop():'';
+fetch(GSHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({
+'first-name':fd.get('firstName')||'','last-name':fd.get('lastName')||'','email':fd.get('email')||'','your-zipcode':fd.get('zipcode')||'',
+'ip_address':'','website_name':'Road Traffic Injury','accident_date':fd.get('accidentDate')||'','universal_leadid':'','xxTrustedFormToken':certUrl
+})}).catch(function(){});
+fetch(LEAD_ADMIN_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+first_name:fd.get('firstName')||'',last_name:fd.get('lastName')||'',email:fd.get('email')||'',phone:fd.get('phone')||'',zip5:fd.get('zipcode')||'',
+cert_url:certUrl,cert_id:certId,accident_date:fd.get('accidentDate')||'',accident_type:fd.get('accidentType')||'',injured:fd.get('injured')||'',
+fault:fd.get('fault')||'',attorney:fd.get('attorney')||'',treated:fd.get('treated')||'',case_description:fd.get('caseDescription')||'',source_url:location.href
+})}).catch(function(){});
+q('.ok',f).style.display='block';f.reset();i=0;show()});show()})();
 /* hero slider + synced photo */
 (function(){var s=qa('.slide'),d=q('.dots'),im=qa('.orb img'),k=0,t;if(!s.length)return;
 s.forEach(function(_,n){var x=document.createElement('i');x.onclick=function(){go(n)};d.appendChild(x)});
